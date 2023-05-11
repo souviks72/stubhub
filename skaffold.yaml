@@ -7,6 +7,8 @@ deploy:
 build:
   local:
     push: false
+  # googleCloudBuild:
+  #   projectId: ticketing-dev-384904
   artifacts:
     - image: souviksdocker/auth
       context: auth
