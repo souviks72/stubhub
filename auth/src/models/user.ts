@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 
+import { Password } from "../services/password";
 // An interace that describes the properties
 // needed to create a new User
 interface UserAttrs {
@@ -9,8 +10,15 @@ interface UserAttrs {
 
 // An interface that describes the properties
 // that a User Model has
-interface UserModel extends mongoose.Model<any> {
-  build(attrs: UserAttrs): any;
+interface UserModel extends mongoose.Model<UserDoc> {
+  build(attrs: UserAttrs): UserDoc;
+}
+
+// interface to describe properties of a User doc
+// Mongo adds new fields, hence this is needed
+interface UserDoc extends mongoose.Document {
+  email: string;
+  password: string;
 }
 
 const userSchema = new mongoose.Schema({
@@ -23,6 +31,17 @@ const userSchema = new mongoose.Schema({
     required: true,
   },
 });
+
+userSchema.pre("save", async function (done) {
+  if (this.isModified("password")) {
+    // if user changes email, then also this hook will be called
+    // that is why we need to check if password is changed
+    const hashed = await Password.toHash(this.get("password"));
+    this.set("password", hashed); // in any Mongodb hook, this refers to the doc, hence no arrow func used
+  }
+  done();
+});
+
 userSchema.statics.build = (attrs: UserAttrs) => {
   return new User(attrs);
 };
@@ -33,6 +52,6 @@ That is why we describe the UserAttrs interface and use the buildUser() func to
 make use of Ts
 */
 
-const User = mongoose.model<any, UserModel>("User", userSchema);
+const User = mongoose.model<UserDoc, UserModel>("User", userSchema);
 
 export { User };
