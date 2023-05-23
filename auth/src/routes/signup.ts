@@ -1,5 +1,6 @@
 import express, { Request, Response } from "express";
 import { body, validationResult } from "express-validator";
+import jwt from "jsonwebtoken";
 
 import { User } from "../models/user";
 
@@ -36,6 +37,21 @@ router.post(
     const user = User.build({ email, password });
     await user.save();
 
+    //Generate JWT
+    const userJwt = jwt.sign(
+      {
+        id: user.id,
+        email: user.email,
+      },
+      process.env.JWT_KEY! // Ts was throwing an error as this can be string or undefined(if we forget to add Key)
+      // if key is undefined, we will know it only after deployment. So best to check in index.ts start()
+      // ! means we are telling Ts that the check is done, dont worry
+    );
+    // Store  it on session object
+    req.session = {
+      //enabled by cookieSession library
+      jwt: userJwt,
+    };
     return res.status(201).send(user);
   }
 );
