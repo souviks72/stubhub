@@ -16,7 +16,7 @@ app.use(json());
 app.use(
   cookieSession({
     signed: false,
-    secure: false,
+    secure: process.env.NODE_ENV !== "test",
   })
 );
 // this will allow us to set JWT tokens(or other data) in the cookie
