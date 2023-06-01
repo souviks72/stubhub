@@ -57,7 +57,7 @@ userSchema.pre("save", async function (done) {
     // if user changes email, then also this hook will be called
     // that is why we need to check if password is changed
     const hashed = await Password.toHash(this.get("password"));
-    this.set("password", hashed); // in any Mongodb hook, this refers to the doc, hence no arrow func used
+    this.set("password", hashed); // in any Mongodb hook, "this" refers to the doc, hence no arrow func used
   }
   done();
 });
