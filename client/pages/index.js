@@ -11,11 +11,12 @@ const LandingPage = ({ currentUser }) => {
 //this getInitialProps is a func provided by NextJs
 //It will run the function inside the server once
 //and return the data to the react component as props,
-//then it will run in the frontend again
+//then it will run in the frontend again, populating
+//the default props of this component
 LandingPage.getInitialProps = async (context) => {
   // context obj is passed as default prop here, it has req obj
   const { data } = await buildClient(context).get("/api/users/currentuser");
-  console.log(data);
+
   return data;
 };
 
